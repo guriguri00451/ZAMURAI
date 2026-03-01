@@ -1,0 +1,71 @@
+Photon Fusion Simple KCC Sample - Release History
+
+Version 2.0.18
+- Updated Simple KCC to 2.0.15.
+
+Version 2.0.17
+- Updated Fusion SDK to 2.0.6 Stable 1034.
+- Updated Simple KCC to 2.0.14.
+
+Version 2.0.16
+- Updated Fusion SDK to 2.0.4 Stable 880.
+- Updated Simple KCC to 2.0.13.
+- Unity 6 compatibility fixes.
+
+Version 2.0.15
+- Updated Fusion SDK to 2.0.2 Stable 851.
+- Updated Simple KCC to 2.0.12.
+
+Version 2.0.14
+- Updated Simple KCC to 2.0.11.
+
+Version 2.0.13
+- Updated Simple KCC to 2.0.10.
+
+Version 2.0.12
+- Updated Fusion SDK to 2.0.1 Stable 835.
+- Updated Simple KCC to 2.0.9.
+
+Version 2.0.11
+- Updated Fusion SDK to 2.0.0 Stable 834.
+- Updated Simple KCC to 2.0.8.
+
+Version 2.0.10
+- Updated Simple KCC to 2.0.7.
+
+Version 2.0.9
+- Updated Fusion SDK to 2.0.0-RC5-824.
+- ReplicateTo() override in PlayerInput replaced by new API.
+
+Version 2.0.8
+- Added tick-aligned look rotation accumulation PlayerInput.
+- Player movement input projected on ground to move along ground tangent.
+- Updated Simple KCC to 2.0.6.
+- Removed Physics addon.
+
+Version 2.0.7
+- Changes related to Simple KCC addon.
+- Updated Fusion SDK to 2.0.0-RC3-807.
+- Updated Simple KCC to 2.0.5.
+
+Version 2.0.6
+- Fixed toolbar utility.
+- Fixed root namespace in editor settings.
+- Updated Fusion SDK to 2.0.0-RC-801.
+
+Version 2.0.5
+- Added simple acceleration model to player movement.
+- Added separate up/down gravity to player.
+- Updated Fusion SDK to 2.0.0-RC-797.
+
+Version 2.0.4
+- Updated Fusion SDK to 2.0.0-794.
+- Updated Simple KCC to 2.0.4.
+
+Version 2.0.3
+- Updated Fusion SDK to 2.0.0-774.
+- Updated Simple KCC to 2.0.3.
+- Updated packages.
+
+Version 2.0.0
+- Initial release.
