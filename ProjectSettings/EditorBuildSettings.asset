@@ -6,8 +6,86 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Playground.unity
+    path: Assets/Example/Shared/Scenes/Startup.unity
+    guid: 0d3b40ecff110444e9d1162e4759a437
+  - enabled: 1
+    path: Assets/Example/00_Showcase/Showcase.unity
+    guid: 55b74c1b02c44de4886ae4d651624926
+  - enabled: 1
+    path: Assets/Example/01_PlayerMovement/01_BasicMovement/BasicMovement.unity
+    guid: a0c33ce2cdd6e0d48ae7d0ba3f972848
+  - enabled: 1
+    path: Assets/Example/01_PlayerMovement/02_AdvancedMovement/AdvancedMovement.unity
     guid: 008e792c0939c684a8a3a53eba6206e0
+  - enabled: 1
+    path: Assets/Example/01_PlayerMovement/03_ExpertMovement/ExpertMovement.unity
+    guid: 584a3cfaf13bb8f4498770d4d175cf8a
+  - enabled: 1
+    path: Assets/Example/01_PlayerMovement/04_TopDownMovement/TopDownMovement.unity
+    guid: 36e61f5fd453a4948aa978ad1e1c21ec
+  - enabled: 1
+    path: Assets/Example/01_PlayerMovement/05_VRMovement/VRMovement.unity
+    guid: 07b325b59dd58ba49808a0b8b0854581
+  - enabled: 1
+    path: Assets/Example/03_Interactions/01_Teleport/Teleports.unity
+    guid: b406b7da7b90f904d9bcea876cc820cc
+  - enabled: 1
+    path: Assets/Example/03_Interactions/02_Portal/Portals.unity
+    guid: 570d743291dc91e429767750115a5591
+  - enabled: 1
+    path: Assets/Example/03_Interactions/03_JumpPad/JumpPads.unity
+    guid: 3b16988a1c35fc64090d63f2d98a5fda
+  - enabled: 1
+    path: Assets/Example/03_Interactions/04_Attractor/Attractors.unity
+    guid: 6534df91b47269f4495c55bc4d49aac3
+  - enabled: 1
+    path: Assets/Example/03_Interactions/05_MovingPlatform/MovingPlatforms.unity
+    guid: b40cf7198b5f39a49a90fe610b519b64
+  - enabled: 1
+    path: Assets/Example/03_Interactions/06_Environments/Environments.unity
+    guid: 841708f19c1858a4eab4c8f3ac3690b5
+  - enabled: 1
+    path: Assets/Example/03_Interactions/07_Forces/Forces.unity
+    guid: bcf765a2d5d00324c88ada2e57a2f2ba
+  - enabled: 1
+    path: Assets/Example/03_Interactions/08_SpeedModifiers/SpeedModifiers.unity
+    guid: c71409abdaf42ef43929b3dce4d8cecf
+  - enabled: 1
+    path: Assets/Example/03_Interactions/09_Miscellaneous/Miscellaneous.unity
+    guid: fb1181e824f7e644a9cfbe3f47b1bfea
+  - enabled: 1
+    path: Assets/Example/04_AI/01_SimpleNPC/SimpleNPC.unity
+    guid: fa15f55213fee7945be095953eb1d610
+  - enabled: 1
+    path: Assets/Example/04_AI/02_NavMeshNPC/NavMeshNPC.unity
+    guid: 0a57818e35bb0244c877587ae2f9a21c
+  - enabled: 1
+    path: Assets/Example/06_Debug/01_Profiling/Profiling.unity
+    guid: 7e85114fc1092e643993eae8c47d24cc
+  - enabled: 1
+    path: Assets/Example/06_Debug/02_InputSmoothing/InputSmoothing.unity
+    guid: fa0b0431039780d459f2d8f026ba7c27
+  - enabled: 1
+    path: Assets/Example/06_Debug/03_BatchClient/BatchClient.unity
+    guid: 416af12dad51f5a47bb0b0a56d5784a2
+  - enabled: 1
+    path: Assets/Example/06_Debug/04_LagCompensation/LagCompensation.unity
+    guid: 3d79e17012a9fb8429fe099f56952a8e
+  - enabled: 1
+    path: Assets/Example/A1_Playgrounds/Stairs.unity
+    guid: 10e0ddb684d05614d8064fcecb130890
+  - enabled: 1
+    path: Assets/Example/A1_Playgrounds/Slopes.unity
+    guid: f6b7463c9e7862a4982bd378eca20143
+  - enabled: 1
+    path: Assets/Example/A1_Playgrounds/Corridors.unity
+    guid: 616c7965953941849950a9af6756e0c3
+  - enabled: 1
+    path: Assets/Example/A1_Playgrounds/Gaps.unity
+    guid: 34baa81f29b0b2c4f8e60fadef7d23b0
+  - enabled: 1
+    path: Assets/Example/A1_Playgrounds/Terrains.unity
+    guid: e92b4eebc0269b2488e1d089b8c93abb
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: a4797352f371e6d4c970c67418a2ed16, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 153b968b30545c541af5f83636fe2d79, type: 2}
