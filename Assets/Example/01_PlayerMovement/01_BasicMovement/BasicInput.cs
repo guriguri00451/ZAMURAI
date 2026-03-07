@@ -8,8 +8,21 @@ namespace Example.BasicMovement
 	/// </summary>
 	public struct BasicInput : INetworkInput
 	{
-		public Vector2     MoveDirection;
-		public Vector2     LookRotationDelta;
-		public NetworkBool Jump;
+		//Updateごとに中身がDefaultに戻るInput群
+		public struct AccumulatedData : INetworkStruct
+		{
+			public Vector2 MoveDirection;
+			public Vector2 LookRotationDelta;
+			public NetworkBool Jump;
+		}
+		//中身がDefaultに戻らずキープされるInput群
+		public struct ContinuousData : INetworkStruct
+		{
+			public NetworkBool Point;
+		}
+
+		// 上で作った型を変数として宣言する
+		public ContinuousData Continuous;
+		public AccumulatedData Accumulated;
 	}
 }

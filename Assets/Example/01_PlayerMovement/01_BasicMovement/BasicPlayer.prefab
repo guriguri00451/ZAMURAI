@@ -693,6 +693,7 @@ GameObject:
   - component: {fileID: 6370244926997209924}
   - component: {fileID: 5120608972067058807}
   - component: {fileID: 5862304426483686283}
+  - component: {fileID: 2902073713505295026}
   m_Layer: 6
   m_Name: BasicPlayer
   m_TagString: Untagged
@@ -737,6 +738,7 @@ MonoBehaviour:
   - {fileID: 5120608972067058807}
   - {fileID: 5862304426483686283}
   - {fileID: 8526007694976389026}
+  ForceRemoteRenderTimeframe: 0
 --- !u!54 &6370244926997209924
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -765,6 +767,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f7684f04e649e84fb2ee1bc9fbee42d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
   _settings:
     Shape: 1
     IsTrigger: 0
@@ -779,12 +782,12 @@ MonoBehaviour:
     InputAuthorityBehavior: 0
     StateAuthorityBehavior: 0
     ProxyInterpolationMode: 0
+    ForcePredictedLookRotation: 0
     AllowClientTeleports: 0
     Processors:
     - {fileID: 4219866145273439913, guid: 1ab62523487a65745ab7ee9663ad9025, type: 3}
     - {fileID: 561824206424634091, guid: 68c4081a63f1dfd469da9c95bea22158, type: 3}
     - {fileID: 8306782452827789390, guid: 6d976f9777012db4aa55e7e6b1991afe, type: 3}
-    TeleportThreshold: 1
     MaxPenetrationSteps: 8
     CCDRadiusMultiplier: 0.75
     AntiJitterDistance: {x: 0.025, y: 0.01}
@@ -792,7 +795,6 @@ MonoBehaviour:
     NetworkedInteractions: 8
     CompressNetworkPosition: 0
     ForceSingleOverlapQuery: 0
-    ForcePredictedLookRotation: 0
     SuppressConvexMeshColliders: 0
 --- !u!114 &5862304426483686283
 MonoBehaviour:
@@ -809,6 +811,28 @@ MonoBehaviour:
   KCC: {fileID: 5120608972067058807}
   CameraPivot: {fileID: 5072942232072495766}
   CameraHandle: {fileID: 3488492166504977242}
+  anim: {fileID: 2902073713505295026}
+--- !u!95 &2902073713505295026
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812586951838351475}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 09f25afcfe2ea45b4a11a2e19b80bda2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9184739679678061684
 GameObject:
   m_ObjectHideFlags: 0

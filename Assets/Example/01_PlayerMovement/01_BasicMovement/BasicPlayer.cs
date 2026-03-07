@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
 using Fusion.Addons.KCC;
+using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
+using UnityEngine.UIElements.Experimental;
 
 namespace Example.BasicMovement
 {
@@ -15,9 +18,12 @@ namespace Example.BasicMovement
 		public Transform CameraPivot;
 		public Transform CameraHandle;
 
-		private int                _lastInputFrame;
-		private BasicInput         _accumulatedInput;
+		[SerializeField] Animator anim;
+		private int	_lastInputFrame;
+		private BasicInput.AccumulatedData _accumulatedBuffer;
+		private BasicInput.ContinuousData _continuousBuffer;
 		private Vector2Accumulator _lookRotationAccumulator = new Vector2Accumulator(0.02f, true);
+		[Networked] public NetworkBool IsPointing { get; set; }
 
 		public override void Spawned()
 		{
@@ -46,24 +52,29 @@ namespace Example.BasicMovement
 				// This code path is executed on InputAuthority and StateAuthority.
 
 				// Apply look rotation delta. This propagates to Transform component immediately.
-				KCC.AddLookRotation(input.LookRotationDelta);
+				KCC.AddLookRotation(input.Accumulated.LookRotationDelta);
 
 				// Set world space input direction. This value is processed later when KCC executes its FixedUpdateNetwork().
 				// By default the value is processed by EnvironmentProcessor - which defines base character speed, handles acceleration/friction, gravity and many other features.
-				Vector3 inputDirection = KCC.Data.TransformRotation * new Vector3(input.MoveDirection.x, 0.0f, input.MoveDirection.y);
+				Vector3 inputDirection = KCC.Data.TransformRotation * new Vector3(input.Accumulated.MoveDirection.x, 0.0f, input.Accumulated.MoveDirection.y);
 				KCC.SetInputDirection(inputDirection);
 
-				if (input.Jump == true && KCC.Data.IsGrounded == true)
+				if (input.Accumulated.Jump == true && KCC.Data.IsGrounded == true)
 				{
 					// Set world space jump vector. This value is processed later when KCC executes its FixedUpdateNetwork().
 					KCC.Jump(Vector3.up * 6.0f);
 				}
+
+				//Pointing更新
+				IsPointing = input.Continuous.Point;
+				Debug.Log(input.Continuous.Point);
 			}
 		}
 
 		public override void Render()
 		{
 			TryAccumulateInput();
+			anim.SetBool("pointing",IsPointing);
 		}
 
 		private void LateUpdate()
@@ -85,15 +96,20 @@ namespace Example.BasicMovement
 		{
 			TryAccumulateInput();
 
+			BasicInput finalInput = new BasicInput();
+
 			// Mouse movement (delta values) is aligned to engine update.
 			// To get perfectly smooth interpolated look, we need to align the mouse input with Fusion ticks.
-			_accumulatedInput.LookRotationDelta = _lookRotationAccumulator.ConsumeTickAligned(runner);
+			_accumulatedBuffer.LookRotationDelta = _lookRotationAccumulator.ConsumeTickAligned(runner);
+
+			finalInput.Accumulated = _accumulatedBuffer;
+			finalInput.Continuous = _continuousBuffer;
 
 			// Accumulated input is consumed.
-			networkInput.Set(_accumulatedInput);
+			networkInput.Set(finalInput);
 
 			// Reset accumulated input to default.
-			_accumulatedInput = default;
+			_accumulatedBuffer = default;
 		}
 
 		private void TryAccumulateInput()
@@ -133,13 +149,15 @@ namespace Example.BasicMovement
 				if (keyboard.aKey.isPressed == true) { moveDirection += Vector2.left;  }
 				if (keyboard.dKey.isPressed == true) { moveDirection += Vector2.right; }
 
-				_accumulatedInput.MoveDirection = moveDirection.normalized;
+				_accumulatedBuffer.MoveDirection = moveDirection.normalized;
 
 				if (keyboard.spaceKey.wasPressedThisFrame == true)
 				{
-					_accumulatedInput.Jump = true;
+					_accumulatedBuffer.Jump = true;
 				}
 			}
+
+			_continuousBuffer.Point = mouse.leftButton.isPressed;
 		}
 	}
 }
