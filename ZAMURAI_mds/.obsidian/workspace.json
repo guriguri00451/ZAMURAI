@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01_feature-list_md.md",
+                "file": "12_issues.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01_feature-list_md"
+              "title": "12_issues"
             }
           }
         ],
@@ -109,7 +109,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "01_feature-list_md.md",
+                "file": "12_issues.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +119,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "01_feature-list_mdへのバックリンク"
+              "title": "12_issuesへのバックリンク"
             }
           },
           {
@@ -128,12 +128,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "01_feature-list_md.md",
+                "file": "12_issues.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "01_feature-list_mdからのアウトゴーイングリンク"
+              "title": "12_issuesからのアウトゴーイングリンク"
             }
           },
           {
@@ -171,13 +171,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01_feature-list_md.md",
+                "file": "12_issues.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "01_feature-list_mdのアウトライン"
+              "title": "12_issuesのアウトライン"
             }
           }
         ]
@@ -200,13 +200,13 @@
   },
   "active": "095b56028fe8dcd1",
   "lastOpenFiles": [
-    "06_directory.md",
-    "12_issues.md",
     "11_GameRule.md",
     "10_classes.md",
     "09_schedule_and_issues_md.md",
-    "01_feature-list_md.md",
+    "06_directory.md",
+    "03_screen-flow_.md",
     "02_tech-stack.md",
-    "03_screen-flow_.md"
+    "01_feature-list_md.md",
+    "12_issues.md"
   ]
 }
