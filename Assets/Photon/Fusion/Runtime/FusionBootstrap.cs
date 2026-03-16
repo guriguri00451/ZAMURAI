@@ -419,7 +419,7 @@ namespace Fusion {
     /// Start as Room on the Photon cloud, and connects as one or more clients.
     /// </summary>
     /// <param name="clientCount"></param>
-    public void StartMultipleSharedClients(int clientCount) {
+    public void StartMultipleSharedClients(int clientCount, string roomName = null) {
       if (NetworkProjectConfig.Global.PeerMode == NetworkProjectConfig.PeerModes.Multiple) {
         if (TryGetSceneRef(out var sceneRef)) {
           StartCoroutine(StartWithClients(GameMode.Shared, sceneRef, clientCount));
