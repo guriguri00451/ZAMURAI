@@ -12,7 +12,7 @@ namespace ZAMURAI.Player
 	/// The minimalistic player implementation. Shows essential code to control KCC.
 	/// </summary>
 	[DefaultExecutionOrder(-5)]
-	public sealed class BasicPlayer_ZAMURAI : NetworkBehaviour
+	public class BasicPlayer_ZAMURAI : NetworkBehaviour
 	{
 		public KCC       KCC;
 		public Transform CameraPivot;
