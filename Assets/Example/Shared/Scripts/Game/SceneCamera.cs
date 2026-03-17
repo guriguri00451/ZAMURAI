@@ -13,8 +13,6 @@ namespace Example
 
 		[SerializeField]
 		private PlatformConfiguration _defaultConfiguration;
-		[SerializeField]
-		private PlatformConfiguration _vrConfiguration;
 
 		private PlatformConfiguration _activeConfiguration;
 
@@ -39,13 +37,13 @@ namespace Example
 
 		private void Awake()
 		{
-			_activeConfiguration = ApplicationUtility.IsVREnabled() == true ? _vrConfiguration : _defaultConfiguration;
-
+			// VRの分岐を削除し、常にデフォルト設定を使用
+            _activeConfiguration = _defaultConfiguration;
+			
 			if (Application.isBatchMode == true)
 				return;
 
 			_defaultConfiguration.SetActive(false);
-			_vrConfiguration.SetActive(false);
 
 			_activeConfiguration.SetActive(true);
 
