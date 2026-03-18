@@ -9,11 +9,15 @@ namespace ZAMURAI.Player
         public int PlayerId;
     }
 
+
     public enum PointActionType
     {
-        tintin,
-        otintin,
+        tuntun,
+        otuntun,
         samurai,
-        tintinsamurai
+        tuntunsamurai,
+        biron,
+        syakin,
     }
+
 }

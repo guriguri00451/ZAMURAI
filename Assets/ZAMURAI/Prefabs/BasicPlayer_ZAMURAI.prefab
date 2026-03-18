@@ -178,13 +178,14 @@ GameObject:
   - component: {fileID: 1211166341388150842}
   - component: {fileID: 2821750270098758253}
   - component: {fileID: 2366453725377721781}
+  - component: {fileID: 5509040280864568116}
   m_Layer: 0
-  m_Name: VoiceObject
+  m_Name: PhotonVoiceChatObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5433413690886672491
 Transform:
   m_ObjectHideFlags: 0
@@ -336,8 +337,8 @@ MonoBehaviour:
   reliableMode: 0
   encrypt: 0
   transmitEnabled: 1
-  samplingRate: 24000
-  frameDuration: 40000
+  samplingRate: 16000
+  frameDuration: 20000
   bitrate: 30000
   sourceType: 0
   microphoneType: 0
@@ -357,6 +358,19 @@ MonoBehaviour:
   useOnAudioFilterRead: 0
   useMicrophoneTypeFallback: 1
   recordWhenJoined: 1
+--- !u!114 &5509040280864568116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426531964355501819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47bac108c0e5b431786f642b84845694, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voskDetector: {fileID: 8448287456332595261}
 --- !u!1 &1828028621674110864
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,6 +505,7 @@ GameObject:
   - component: {fileID: 4358449281701799418}
   - component: {fileID: 8593086464734864927}
   - component: {fileID: 6245694967659450784}
+  - component: {fileID: 2428428452605947603}
   m_Layer: 6
   m_Name: BasicPlayer_ZAMURAI
   m_TagString: Untagged
@@ -513,6 +528,7 @@ Transform:
   - {fileID: 5012237038692309796}
   - {fileID: 1937581071841634601}
   - {fileID: 5433413690886672491}
+  - {fileID: 2706215563038054801}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -632,8 +648,8 @@ MonoBehaviour:
   CameraPivot: {fileID: 1937581071841634601}
   CameraHandle: {fileID: 7848789578782939365}
   anim: {fileID: 8413604845744640269}
-  _IsPointing:
-    _value: 0
+  voiceDetector: {fileID: 8448287456332595261}
+  _IsPointing: 0
 --- !u!114 &8593086464734864927
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,6 +672,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6376dd7fc23b3764483a7349b58502e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2428428452605947603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3526036885401717708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8edbe7108d8a43ab838cf8b8d9453df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &4207495201309238586
@@ -940,6 +968,73 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7313576434376493397
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2706215563038054801}
+  - component: {fileID: 8448287456332595261}
+  - component: {fileID: 1894760139172567988}
+  m_Layer: 0
+  m_Name: VoskVoiceCommandDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2706215563038054801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313576434376493397}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.08405697, y: 0.561855, z: -0.015882378}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7616533097711895883}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8448287456332595261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313576434376493397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d65e863daa5345c68108b71e4224e82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voiceProcessor: {fileID: 1894760139172567988}
+  ModelPath: vosk-model-small-ja-0.22.zip
+  MaxAlternatives: 3
+  MaxRecordLength: 5
+  AutoStart: 0
+  voiceCommand: {fileID: 11400000, guid: 0afe3d9fcfd1e413d8cdef7f4955e8f6, type: 2}
+--- !u!114 &1894760139172567988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313576434376493397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf39116cc6db44d47b2eaf534e0f6682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MicrophoneIndex: 0
+  _minimumSpeakingSampleValue: 0.05
+  _silenceTimer: 1
+  _autoDetect: 0
 --- !u!1 &8037623479897172340
 GameObject:
   m_ObjectHideFlags: 0

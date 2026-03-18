@@ -2,9 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
 using Fusion.Addons.KCC;
-using UnityEngine.UIElements;
+using Cysharp.Threading.Tasks;
 using Cursor = UnityEngine.Cursor;
-using UnityEngine.UIElements.Experimental;
 
 namespace ZAMURAI.Player
 {
@@ -19,6 +18,7 @@ namespace ZAMURAI.Player
 		public Transform CameraHandle;
 
 		[SerializeField] Animator anim;
+		[SerializeField] VoiceDetector voiceDetector;
 		private int	_lastInputFrame;
 		private BasicInput_ZAMURAI.AccumulatedData _accumulatedBuffer;
 		private BasicInput_ZAMURAI.ContinuousData _continuousBuffer;
@@ -35,6 +35,8 @@ namespace ZAMURAI.Player
 				// Hide cursor.
 				Cursor.lockState = CursorLockMode.Locked;
 				Cursor.visible = false;
+
+				voiceDetector.OnTranscriptionResult += PointActionHandler;
 			}
 		}
 
@@ -70,7 +72,6 @@ namespace ZAMURAI.Player
 				{
 					IsPointing = input.Continuous.Point;
 				}
-				Debug.Log(input.Continuous.Point);
 			}
 		}
 
@@ -160,7 +161,26 @@ namespace ZAMURAI.Player
 				}
 			}
 
-			_continuousBuffer.Point = mouse.leftButton.isPressed;
+			// Pointing action
+			if (mouse.leftButton.isPressed == true)
+			{
+				_continuousBuffer.Point = true;
+				voiceDetector.SwitchRecording(true);
+			}
+			else
+			{
+				_continuousBuffer.Point = false;
+				voiceDetector.SwitchRecording(false);
+			}
+
+		}
+
+		private void PointActionHandler(PointActionType command)
+		{
+			Debug.Log($"Transcribed command: {command}");
+			// ここでコマンドに応じた処理を実装します。
+			// 例えば、コマンドに応じてアニメーションを再生したり、ゲーム内のオブジェクトを操作したりできます。
 		}
 	}
+	
 }

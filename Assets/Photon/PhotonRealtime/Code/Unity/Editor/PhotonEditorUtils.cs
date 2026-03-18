@@ -33,6 +33,7 @@ namespace Photon.Realtime
 
     #if UNITY_2021_3_OR_NEWER
     using UnityEditor.Build;
+    using UnityEditor.Build.Reporting;
     #endif
 
     [InitializeOnLoad]
