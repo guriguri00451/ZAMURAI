@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fusion;
+using Cysharp.Threading.Tasks;
 
 namespace Example.BasicMovement
 {
@@ -48,12 +49,31 @@ namespace Example.BasicMovement
 			// Every player should be always interested to his player object to prevent accidentally getting out of Area of Interest.
 			// This is valid only if the Interest Management is enabled in Network Project Config.
 			Runner.SetPlayerAlwaysInterested(playerRef, player, true);
+			PlayersManager.Instance.AddPlayer(playerRef);
 		}
 
 		private void DespawnPlayer(PlayerRef playerRef, BasicPlayer player)
 		{
 			// We simply despawn the player object. No other cleanup is needed here.
 			Runner.Despawn(player.Object);
+			PlayersManager.Instance.RemovePlayer(playerRef);
+		}
+
+		private void DespawnPlayer(PlayerRef playerRef, NetworkObject playerObj)
+		{
+			Runner.Despawn(playerObj);
+			PlayersManager.Instance.RemovePlayer(playerRef);
+		}
+
+		public async void RespawnPlayer(PlayerRef playerRef)
+		{
+			// 1. ネットワーク上からプレイヤーオブジェクトを完全に消去 (Despawn)
+			DespawnPlayer(playerRef, Runner.GetPlayerObject(playerRef));
+			
+			// 2. リスポーンまでの待機時間（例：3秒）
+			await UniTask.Delay(3000);
+
+			SpawnPlayer(playerRef);
 		}
 	}
 }

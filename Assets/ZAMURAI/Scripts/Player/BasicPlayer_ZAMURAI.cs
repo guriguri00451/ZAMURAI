@@ -17,16 +17,25 @@ namespace ZAMURAI.Player
 		public Transform CameraPivot;
 		public Transform CameraHandle;
 
-		[SerializeField] Animator anim;
+		[SerializeField] Animator inputerAnim;
+		[SerializeField] Animator proxyAnim;
 		[SerializeField] VoiceDetector voiceDetector;
+		[SerializeField] SpriteRenderer HorrorDeathEffect;
+		private PlayerRef myPlayerRef;
 		private int	_lastInputFrame;
 		private BasicInput_ZAMURAI.AccumulatedData _accumulatedBuffer;
 		private BasicInput_ZAMURAI.ContinuousData _continuousBuffer;
 		private Vector2Accumulator _lookRotationAccumulator = new Vector2Accumulator(0.02f, true);
+		private float rightleft;
+		private float frontback;
+		private float updown;
+		private bool isGrounded;
+		private bool isDead;
 		[Networked] public bool IsPointing { get; set; }
 
 		public override void Spawned()
 		{
+			isDead = false;
 			if (HasInputAuthority == true)
 			{
 				// Register input polling for local player.
@@ -37,6 +46,8 @@ namespace ZAMURAI.Player
 				Cursor.visible = false;
 
 				voiceDetector.OnTranscriptionResult += PointActionHandler;
+				myPlayerRef = Object.InputAuthority;
+				PlayersManager.Instance.AddPlayer(myPlayerRef);
 			}
 		}
 
@@ -72,13 +83,57 @@ namespace ZAMURAI.Player
 				{
 					IsPointing = input.Continuous.PointingData.pointing;
 				}
+
+				//Debug指差しコマンド
+				if(input.Accumulated.PointAction.Type != PointActionType.none)
+				{
+					PointActionHandler(input.Accumulated.PointAction.Type);
+				}
+
 			}
 		}
 
-		public override void Render()
+
+        void OnCollisionEnter(Collision collision)
+        {
+            Debug.Log("ssss");
+            if(HasInputAuthority == false || isDead == true) return;
+            
+            if(collision.gameObject.CompareTag("Enemy"))
+            {
+                isDead = true;
+                PlayersManager.Instance.RPC_PlayerDied(Object.InputAuthority);
+            }
+        }
+
+		
+
+        public override void Render()
 		{
+			ProxyAnimUpdate();
+			InputerAnimUpdate();
 			TryAccumulateInput();
-			anim.SetBool("pointing",IsPointing);
+		}
+
+		private void ProxyAnimUpdate()
+		{
+			Vector3 localVel = transform.InverseTransformDirection(KCC.Data.RealVelocity);
+			rightleft = localVel.x;
+			updown = localVel.y;
+			frontback = localVel.z;
+
+			isGrounded = KCC.Data.IsGrounded;
+
+			proxyAnim.SetFloat("MoveX", rightleft);
+			proxyAnim.SetFloat("MoveY", frontback);
+			proxyAnim.SetBool("isGrounded", updown != 0);
+
+			proxyAnim.SetBool("pointing", IsPointing);
+		}
+
+		private void InputerAnimUpdate()
+		{
+			inputerAnim.SetBool("pointing", IsPointing);
 		}
 
 		private void LateUpdate()
@@ -162,7 +217,11 @@ namespace ZAMURAI.Player
 
 				if (keyboard.zKey.isPressed == true)
 				{
-					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntunsamurai, PlayerId = Object.InputAuthority.PlayerId };
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntun, PlayerId = Object.InputAuthority.PlayerId };
+				}
+				if (keyboard.xKey.isPressed == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntun, PlayerId = Object.InputAuthority.PlayerId };
 				}
 			}
 
@@ -181,28 +240,71 @@ namespace ZAMURAI.Player
 			}
 
 		}
-
-		private void PointActionHandler(PointActionType command)
+        private void PointActionHandler(PointActionType command)
 		{
 			Debug.Log($"Transcribed command: {command}");
-			// ここでコマンドに応じた処理を実装します。
-			// 例えば、コマンドに応じてアニメーションを再生したり、ゲーム内のオブジェクトを操作したりできます。
+			if(_continuousBuffer.PointingData.pointing == false) return;
+
+			if (isDead) return;
+
+            Debug.Log($"音声認識コマンド: {command}");
+            PlayersManager.Instance.RPC_ProcessVoiceInput(Object.InputAuthority, command, GetFrontPlayerRef());
 		}
 
-		private void GetFrontPlayer()
-		{
-			// 前方のプレイヤーを取得する例
-			RaycastHit hit;
-			if (Physics.Raycast(CameraHandle.position, CameraHandle.forward, out hit, 5f))
-			{
-				BasicPlayer_ZAMURAI frontPlayer = hit.collider.GetComponent<BasicPlayer_ZAMURAI>();
-				if (frontPlayer != null)
-				{
-					Debug.Log($"Front player found: {frontPlayer.name}");
-					// ここでfrontPlayerに対して何らかの処理を行うことができます。
-				}
-			}
-		}
+		// 目の前のプレイヤーの「PlayerRef」を返すように変更
+        private PlayerRef GetFrontPlayerRef()
+        {
+            RaycastHit hit;
+            // 指をさすので、少し長めの距離(10fなど)にしておくと判定しやすいです
+            if (Physics.Raycast(CameraHandle.position, CameraHandle.forward, out hit, 10f))
+            {
+                BasicPlayer_ZAMURAI frontPlayer = hit.collider.GetComponentInParent<BasicPlayer_ZAMURAI>();
+                if (frontPlayer != null)
+                {
+                    Debug.Log($"指した相手: {frontPlayer.name}");
+                    return frontPlayer.Object.InputAuthority;
+                }
+            }
+            return PlayerRef.None; // 誰もいなかったらNoneを返す
+        }
+		
+        [Rpc(RpcSources.All, RpcTargets.InputAuthority)]
+        public void RPC_PlayDeathEffect()
+        {
+            // クライアント側で非同期の演出をスタートさせる
+            // 警告が出ないように .Forget() をつけるのが UniTask の推奨です
+            DeathEffect().Forget();
+        }
+
+        // Death() は消すか残すか自由ですが、演出本体はこちらを使います
+        private async UniTask DeathEffect()
+        {
+            // 安全策：オブジェクトが既に消えていたら何もしない
+            if (HorrorDeathEffect == null) return; 
+
+            for(int i = 0; i < 14; i++)
+            {
+                // 待機中にDespawnされてオブジェクトが消えたらループを抜ける
+                if (this == null || HorrorDeathEffect == null) break;
+
+                HorrorDeathEffect.enabled = !HorrorDeathEffect.enabled;
+                Color color = Random.ColorHSV();
+				color.a = 1;
+				HorrorDeathEffect.color = color;
+                
+                await UniTask.Delay(200);
+            }
+
+            if (HorrorDeathEffect != null)
+            {
+                HorrorDeathEffect.enabled = false;
+            }
+
+			if(CameraHandle == null) return;
+			Vector3 tempPos = CameraHandle.position; // 一度コピーを変数に入れる
+			tempPos.y = -30f;                        // コピーのYを書き換える
+			CameraHandle.position = tempPos;         // 本体のpositionに丸ごと上書きする
+        }
 	}
 	
 }

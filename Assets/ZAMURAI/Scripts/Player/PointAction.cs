@@ -12,6 +12,7 @@ namespace ZAMURAI.Player
 
     public enum PointActionType
     {
+        none,
         tuntun,
         otuntun,
         samurai,
