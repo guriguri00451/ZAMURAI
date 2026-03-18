@@ -70,7 +70,7 @@ namespace ZAMURAI.Player
 				//Pointing更新
 				if (Object.HasStateAuthority) 
 				{
-					IsPointing = input.Continuous.Point;
+					IsPointing = input.Continuous.PointingData.pointing;
 				}
 			}
 		}
@@ -159,17 +159,24 @@ namespace ZAMURAI.Player
 				{
 					_accumulatedBuffer.Jump = true;
 				}
+
+				if (keyboard.zKey.isPressed == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntunsamurai, PlayerId = Object.InputAuthority.PlayerId };
+				}
 			}
 
 			// Pointing action
 			if (mouse.leftButton.isPressed == true)
 			{
-				_continuousBuffer.Point = true;
+				_continuousBuffer.PointingData.pointing = true;
+				_continuousBuffer.PointingData.PointingPlayerId = Object.InputAuthority.PlayerId;
+
 				voiceDetector.SwitchRecording(true);
 			}
 			else
 			{
-				_continuousBuffer.Point = false;
+				_continuousBuffer.PointingData.pointing = false;
 				voiceDetector.SwitchRecording(false);
 			}
 
@@ -180,6 +187,21 @@ namespace ZAMURAI.Player
 			Debug.Log($"Transcribed command: {command}");
 			// ここでコマンドに応じた処理を実装します。
 			// 例えば、コマンドに応じてアニメーションを再生したり、ゲーム内のオブジェクトを操作したりできます。
+		}
+
+		private void GetFrontPlayer()
+		{
+			// 前方のプレイヤーを取得する例
+			RaycastHit hit;
+			if (Physics.Raycast(CameraHandle.position, CameraHandle.forward, out hit, 5f))
+			{
+				BasicPlayer_ZAMURAI frontPlayer = hit.collider.GetComponent<BasicPlayer_ZAMURAI>();
+				if (frontPlayer != null)
+				{
+					Debug.Log($"Front player found: {frontPlayer.name}");
+					// ここでfrontPlayerに対して何らかの処理を行うことができます。
+				}
+			}
 		}
 	}
 	

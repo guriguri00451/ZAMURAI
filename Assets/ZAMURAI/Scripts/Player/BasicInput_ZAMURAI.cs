@@ -19,7 +19,13 @@ namespace ZAMURAI.Player
 		//中身がDefaultに戻らずキープされるInput群
 		public struct ContinuousData : INetworkStruct
 		{
-			public NetworkBool Point;
+			public PointingData PointingData;
+		}
+
+		public struct PointingData : INetworkStruct
+		{
+			public NetworkBool pointing;
+			public int PointingPlayerId;
 		}
 		// 上で作った型を変数として宣言する
 		public ContinuousData Continuous;
