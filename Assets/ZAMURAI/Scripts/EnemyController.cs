@@ -57,13 +57,6 @@ public class EnemyController : NetworkBehaviour
         EnemyState = 2;
     }
 
-    public void HitPlayer()
-    {
-        if(HasStateAuthority == false) return;
-
-        PlayersManager.Instance.RPC_PlayerDied(Object.InputAuthority);
-    }
-
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public async void RPC_HuntPlayer(PlayerRef target)
     {

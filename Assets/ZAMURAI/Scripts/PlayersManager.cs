@@ -6,29 +6,32 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework.Internal;
 using ZAMURAI.Player;
 using Example.BasicMovement;
+using ZAMURAI;
+using System.Threading.Tasks;
 public class PlayersManager : NetworkBehaviour
 {
     public static PlayersManager Instance { get; private set; }
     [SerializeField] private BasicGameplayManager gameplayManager;
     private List<PlayerRef> playerRefs = new List<PlayerRef>();
 
-    // ▼ ちんちん侍用のネットワーク変数（ホストが管理して全員に共有する）
+    // とうんトゥン侍用のネットワーク変数（ホストが管理して全員に共有する）
     [Networked] public PlayerRef currentTurnPlayer { get; set; }   // 今コマンドを言うべき人
     [Networked] public PlayerRef currentTargetPlayer { get; set; } // 指された人
     [Networked] public PointActionType currentCommand { get; set; } // 現在発動中のコマンド
     [Networked] public TickTimer reactionTimer { get; set; }       // 制限時間（時間切れで殺す）
+    [Header("Game Difficulty")]
+    [SerializeField] private float firstTurnTime = 15f;    // 最初の人が喋るまで（長め）
+    [SerializeField] private float nextCommandTime = 8f;   // 次のコマンドを言うまで
+    [SerializeField] private float reactionTime = 6f;      // リアクション（シャキーン等）の猶予
+    [SerializeField] private int goalTurnCount = 20;
+    private int turnCount;
+    private HashSet<PlayerRef> readyPlayers = new HashSet<PlayerRef>();
     
 
     public override void Spawned()
     {
         Instance = this;
-        // 起動時にとりあえず今の全員を入れる（安全策）
-        foreach (var p in Runner.ActivePlayers) 
-        {
-            AddPlayer(p);
-        }
-
-        TestStart();
+        TuntunStart();
     }
 
     public void AddPlayer(PlayerRef playerRef)
@@ -64,7 +67,7 @@ public class PlayersManager : NetworkBehaviour
         }
     }
 
-    private async void TestStart()
+    private async void TuntunStart()
     {
         if (!Object.HasStateAuthority) return; 
 
@@ -73,17 +76,18 @@ public class PlayersManager : NetworkBehaviour
 
         if (playerRefs.Count > 0)
         {
+            turnCount = 0;
             // 最初のターンプレイヤーをランダムに決定し、ゲームスタート！
             currentTurnPlayer = RandomPlayer();
-            currentCommand = PointActionType.tuntun;
-            reactionTimer = TickTimer.CreateFromSeconds(Runner, 10f); // 最初の人が喋るまでの制限時間
+            currentCommand = PointActionType.none;
+            reactionTimer = TickTimer.CreateFromSeconds(Runner, 100f); // 最初の人が喋るまでの制限時間
             
             Debug.Log($"ゲームスタート！最初の番は {currentTurnPlayer} です！");
         }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_MissRitual(PlayerRef playerWhoActed)
+    public async void RPC_MissRitual(PlayerRef playerWhoActed)
     {
         // 判定はStateAuthority（部屋の主など）が一括で行うのが「安全」
         if (!Object.HasStateAuthority) return;
@@ -92,16 +96,29 @@ public class PlayersManager : NetworkBehaviour
             currentTurnPlayer = PlayerRef.None;
             reactionTimer = TickTimer.None;
 
+            foreach(var p in playerRefs)
+            {
+                GetPlayerScript(p).RPC_PlayMissEffect();
+            }
+
             // 失敗：間違えた奴に化物を送り込む！
             Debug.LogError($"儀式失敗！ {playerWhoActed} がトチった！");
             
             if (EnemyController.Instance != null)
             {
                 // ここでEnemy側のRPCを叩く！
+
+                Debug.LogError($"本番だったらお前は死んでいる");
                 EnemyController.Instance.RPC_HuntPlayer(playerWhoActed);
             }
+            // 5秒くらい「あーあ…」という絶望タイムを作る
+            await UniTask.Delay(5000);
+
+            // --- 3. 再スタート処理 ---
+            TuntunStart();
         }
     }
+
     // ▼ プレイヤーは「自分のID、喋った言葉、指した相手（いなければNone）」を投げるだけ！
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ProcessVoiceInput(PlayerRef sender, PointActionType spokenWord, PlayerRef target)
@@ -132,20 +149,17 @@ public class PlayersManager : NetworkBehaviour
             Debug.Log($"{sender} が {target} に向かって {spokenWord} を発動！");
             currentTargetPlayer = target;
             currentCommand = spokenWord;
+            readyPlayers.Clear(); // 判定用リストをリセット
 
             if (spokenWord == PointActionType.tuntun) // 「トゥントゥン」だった場合
             {
-                // リアクション不要。ターゲットのターンへ即移行
-                currentTurnPlayer = currentTargetPlayer;
-                currentCommand = PointActionType.none;
-                reactionTimer = TickTimer.CreateFromSeconds(Runner, 5f);
-                
+                TurnSuccess();
                 // AddSuccessCount(); // 規定回数クリアを入れるならここでカウントアップ
             }
             else if (spokenWord == PointActionType.otuntun || spokenWord == PointActionType.samurai || spokenWord == PointActionType.tuntunsamurai)
             {
                 // 「おtぅんトゥン」「侍」「トゥントゥン侍」は相手のリアクション待ちへ移行
-                reactionTimer = TickTimer.CreateFromSeconds(Runner, 3f);
+                reactionTimer = TickTimer.CreateFromSeconds(Runner, reactionTime);
             }
             else
             {
@@ -158,14 +172,45 @@ public class PlayersManager : NetworkBehaviour
         // --------------------------------------------------------
         else
         {
-            // 指された本人以外が喋ったら処刑！
-            if (sender != currentTargetPlayer)
+
+            bool isSuccess = false;
+
+            // 「トゥントゥン侍」への正しい返し
+            if (currentCommand == PointActionType.tuntunsamurai)
             {
+                // 指した本人（currentTurnPlayer）以外が「トゥントゥン侍」と言ったらカウント
+                if (spokenWord == PointActionType.tuntunsamurai)
+                {
+                    readyPlayers.Add(sender);
+                    Debug.Log($"{sender} がポーズ！ 現在の人数: {readyPlayers.Count}");
+
+                    // 自分以外の全員が成功したかチェック
+                    Debug.Log(playerRefs.Count);
+                    if (readyPlayers.Count >= playerRefs.Count)
+                    {
+                        Debug.Log("全員成功！トゥントゥン侍！");
+                        isSuccess = true;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else if (spokenWord != PointActionType.none && spokenWord != PointActionType.tuntunsamurai)
+                {
+                    // 全員タイムなのに違う言葉を叫んだら処刑
+                    RPC_MissRitual(sender);
+                    return;
+                }
+            }
+            // 指された本人以外が喋ったら処刑！
+            else if (sender != currentTargetPlayer)
+            {
+                Debug.Log("sender:" + sender);
+                Debug.Log("target:" + currentTargetPlayer);
                 RPC_MissRitual(sender);
                 return;
             }
-
-            bool isSuccess = false;
 
             // 「侍」への正しい返し
             if (currentCommand == PointActionType.samurai && spokenWord == PointActionType.syakin)
@@ -179,21 +224,11 @@ public class PlayersManager : NetworkBehaviour
                 isSuccess = true;
                 Debug.Log("びろーん成功！");
             }
-            // 「トゥントゥン侍」への正しい返し
-            else if (currentCommand == PointActionType.tuntunsamurai && spokenWord == PointActionType.tuntunsamurai)
-            {
-                isSuccess = true;
-                Debug.Log("おちんちん侍のポーズ成功！");
-            }
+            
 
             if (isSuccess)
             {
-                // 成功！次はリアクションした人の番になる
-                currentTurnPlayer = currentTargetPlayer;
-                currentCommand = PointActionType.none;
-                reactionTimer = TickTimer.CreateFromSeconds(Runner, 5f);
-                
-                // AddSuccessCount(); // 規定回数クリアを入れるならここでカウントアップ
+                TurnSuccess();
             }
             else
             {
@@ -203,6 +238,48 @@ public class PlayersManager : NetworkBehaviour
         }
     }
 
+    private void TurnSuccess()
+    {
+        turnCount++;
+        if(turnCount >= goalTurnCount)
+        {
+            GameClear();
+            return;
+        }
+        // リアクション不要。ターゲットのターンへ即移行
+        currentTurnPlayer = currentTargetPlayer;
+        currentCommand = PointActionType.none;
+        reactionTimer = TickTimer.CreateFromSeconds(Runner, nextCommandTime);
+    }
+    public async void GameClear()
+    {
+        Debug.Log("Clear!!");
+        foreach(var p in playerRefs)
+        {
+            GetPlayerScript(p).RPC_GameClear();
+        }
+        await UniTask.Delay(7000);
+        LeaveAndTitle().Forget();
+    }
+
+    // 接続を切ってタイトルシーンへ遷移する
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public async UniTask LeaveAndTitle()
+    {
+        if (Runner != null)
+        {
+            // 1. Fusionのネットワーク接続をシャットダウン
+            await Runner.Shutdown();
+        }
+
+        // 2. カーソルを表示状態に戻す（これ忘れるとタイトルで何も押せないｗ）
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // 3. Unityのシーンマネージャーでタイトルシーンを読み込む
+        // ※"Title" の部分は、自分のプロジェクトのタイトルシーン名に変えてください
+        UnityEngine.SceneManagement.SceneManager.LoadScene(Scenes.Title.ToString());
+    }
     public PlayerRef RandomPlayer()
     {
         if (playerRefs.Count == 0) return default;

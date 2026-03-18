@@ -642,6 +642,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameplayManager: {fileID: 8953277532392238228}
   _currentCommand: 0
+  firstTurnTime: 100
+  nextCommandTime: 100
+  reactionTime: 100
+  goalTurnCount: 3
 --- !u!4 &2079408779
 Transform:
   m_ObjectHideFlags: 0

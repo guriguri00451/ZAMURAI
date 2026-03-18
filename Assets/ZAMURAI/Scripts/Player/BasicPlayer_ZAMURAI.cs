@@ -19,8 +19,11 @@ namespace ZAMURAI.Player
 
 		[SerializeField] Animator inputerAnim;
 		[SerializeField] Animator proxyAnim;
-		[SerializeField] VoiceDetector voiceDetector;
+		//[SerializeField] VoiceDetector voiceDetector;
 		[SerializeField] SpriteRenderer HorrorDeathEffect;
+		[Header("Targeting Settings")]
+		[SerializeField] private float castRadius = 2.0f; // 判定の太さ（大きくするほどガバくなる）
+        [SerializeField] private float castRange = 10.0f; // 届く距離
 		private PlayerRef myPlayerRef;
 		private int	_lastInputFrame;
 		private BasicInput_ZAMURAI.AccumulatedData _accumulatedBuffer;
@@ -31,6 +34,17 @@ namespace ZAMURAI.Player
 		private float updown;
 		private bool isGrounded;
 		private bool isDead;
+		[Header("SE Settings")]
+		[SerializeField] private AudioSource audioSource;
+		[SerializeField] private AudioClip seTuntun;
+		[SerializeField] private AudioClip seOtuntun;
+		[SerializeField] private AudioClip seSamurai;
+		[SerializeField] private AudioClip seTuntunSamurai;
+		[SerializeField] private AudioClip seSyakin;
+		[SerializeField] private AudioClip seBiron;
+		[SerializeField] private AudioClip seMissed;
+		[SerializeField] private AudioClip seDeath;
+		[SerializeField] private AudioClip seClear;
 		[Networked] public bool IsPointing { get; set; }
 
 		public override void Spawned()
@@ -45,7 +59,7 @@ namespace ZAMURAI.Player
 				Cursor.lockState = CursorLockMode.Locked;
 				Cursor.visible = false;
 
-				voiceDetector.OnTranscriptionResult += PointActionHandler;
+				//voiceDetector.OnTranscriptionResult += PointActionHandler;
 				myPlayerRef = Object.InputAuthority;
 				PlayersManager.Instance.AddPlayer(myPlayerRef);
 			}
@@ -92,20 +106,6 @@ namespace ZAMURAI.Player
 
 			}
 		}
-
-
-        void OnCollisionEnter(Collision collision)
-        {
-            Debug.Log("ssss");
-            if(HasInputAuthority == false || isDead == true) return;
-            
-            if(collision.gameObject.CompareTag("Enemy"))
-            {
-                isDead = true;
-                PlayersManager.Instance.RPC_PlayerDied(Object.InputAuthority);
-            }
-        }
-
 		
 
         public override void Render()
@@ -215,13 +215,29 @@ namespace ZAMURAI.Player
 					_accumulatedBuffer.Jump = true;
 				}
 
-				if (keyboard.zKey.isPressed == true)
+				if (keyboard.zKey.wasPressedThisFrame == true)
 				{
 					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntun, PlayerId = Object.InputAuthority.PlayerId };
 				}
-				if (keyboard.xKey.isPressed == true)
+				if (keyboard.xKey.wasPressedThisFrame == true)
 				{
-					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntun, PlayerId = Object.InputAuthority.PlayerId };
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.otuntun, PlayerId = Object.InputAuthority.PlayerId };
+				}
+				if (keyboard.cKey.wasPressedThisFrame == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.samurai, PlayerId = Object.InputAuthority.PlayerId };
+				}
+				if (keyboard.vKey.wasPressedThisFrame == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.tuntunsamurai, PlayerId = Object.InputAuthority.PlayerId };
+				}
+				if (keyboard.bKey.wasPressedThisFrame == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.biron, PlayerId = Object.InputAuthority.PlayerId };
+				}
+				if (keyboard.nKey.wasPressedThisFrame == true)
+				{
+					_accumulatedBuffer.PointAction = new PointAction { Type = PointActionType.syakin, PlayerId = Object.InputAuthority.PlayerId };
 				}
 			}
 
@@ -231,12 +247,12 @@ namespace ZAMURAI.Player
 				_continuousBuffer.PointingData.pointing = true;
 				_continuousBuffer.PointingData.PointingPlayerId = Object.InputAuthority.PlayerId;
 
-				voiceDetector.SwitchRecording(true);
+				//voiceDetector.SwitchRecording(true);
 			}
 			else
 			{
 				_continuousBuffer.PointingData.pointing = false;
-				voiceDetector.SwitchRecording(false);
+				//voiceDetector.SwitchRecording(false);
 			}
 
 		}
@@ -248,15 +264,37 @@ namespace ZAMURAI.Player
 			if (isDead) return;
 
             Debug.Log($"音声認識コマンド: {command}");
+			RPC_PointActionSound(command);
             PlayersManager.Instance.RPC_ProcessVoiceInput(Object.InputAuthority, command, GetFrontPlayerRef());
+		}
+
+		[Rpc(RpcSources.All, RpcTargets.All)] // 全員の画面で音を鳴らす
+		private void RPC_PointActionSound(PointActionType type)
+		{
+			AudioClip clipToPlay = null;
+
+			switch (type)
+			{
+				case PointActionType.tuntun:         clipToPlay = seTuntun; break;
+				case PointActionType.otuntun:        clipToPlay = seOtuntun; break;
+				case PointActionType.samurai:        clipToPlay = seSamurai; break;
+				case PointActionType.tuntunsamurai:  clipToPlay = seTuntunSamurai; break;
+				case PointActionType.syakin:         clipToPlay = seSyakin; break;
+				case PointActionType.biron:          clipToPlay = seBiron; break;
+				default: return; // none の時などは何もしない
+			}
+
+			if (clipToPlay != null && audioSource != null)
+			{
+				audioSource.PlayOneShot(clipToPlay);
+			}
 		}
 
 		// 目の前のプレイヤーの「PlayerRef」を返すように変更
         private PlayerRef GetFrontPlayerRef()
         {
-            RaycastHit hit;
-            // 指をさすので、少し長めの距離(10fなど)にしておくと判定しやすいです
-            if (Physics.Raycast(CameraHandle.position, CameraHandle.forward, out hit, 10f))
+			RaycastHit hit;
+            if (Physics.SphereCast(CameraHandle.position, castRadius, CameraHandle.forward, out hit, castRange))
             {
                 BasicPlayer_ZAMURAI frontPlayer = hit.collider.GetComponentInParent<BasicPlayer_ZAMURAI>();
                 if (frontPlayer != null)
@@ -265,7 +303,23 @@ namespace ZAMURAI.Player
                     return frontPlayer.Object.InputAuthority;
                 }
             }
+			if (Physics.Raycast(CameraHandle.position, CameraHandle.forward, out hit, 10f))
+			{
+				BasicPlayer_ZAMURAI frontPlayer = hit.collider.GetComponentInParent<BasicPlayer_ZAMURAI>();
+
+				if (frontPlayer != null)
+				{
+					Debug.Log($"指した相手: {frontPlayer.name}");
+					return frontPlayer.Object.InputAuthority;
+				}
+			}
+			Debug.Log("見つからず");
             return PlayerRef.None; // 誰もいなかったらNoneを返す
+        }
+		[Rpc(RpcSources.All, RpcTargets.InputAuthority)]
+        public void RPC_PlayMissEffect()
+        {
+			audioSource.PlayOneShot(seMissed);
         }
 		
         [Rpc(RpcSources.All, RpcTargets.InputAuthority)]
@@ -274,6 +328,7 @@ namespace ZAMURAI.Player
             // クライアント側で非同期の演出をスタートさせる
             // 警告が出ないように .Forget() をつけるのが UniTask の推奨です
             DeathEffect().Forget();
+			audioSource.PlayOneShot(seDeath);
         }
 
         // Death() は消すか残すか自由ですが、演出本体はこちらを使います
@@ -305,6 +360,12 @@ namespace ZAMURAI.Player
 			tempPos.y = -30f;                        // コピーのYを書き換える
 			CameraHandle.position = tempPos;         // 本体のpositionに丸ごと上書きする
         }
+
+		[Rpc(RpcSources.All, RpcTargets.InputAuthority)]
+        public async void RPC_GameClear()
+		{
+			audioSource.PlayOneShot(seClear);
+		}
+
 	}
-	
 }
