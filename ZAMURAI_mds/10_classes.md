@@ -62,12 +62,12 @@ classDiagram
     note for NetworkActorMovement "BasicPlayerを名前変えて使用"
 
     %% --- 3. プレイヤー実体 (Sample Based) ---
-    class PlayersHub {
+    class PlayersManager {
         <<BaseActor>>
         Player達を管理
     }
     
-    class PlayerController {
+    class BasicPlayer_ZAMURAI {
         <<BaseActor>>
         Playerを管理
     }
@@ -90,10 +90,10 @@ classDiagram
     
     
     %% --- 参照 ---
-    GameManager --> PlayersHub
-    PlayersHub --> PlayerController
-    NetworkActorMovement <..> PlayerController
-    PlayerController --> XXAddonPlayer
+    GameManager --> PlayersManager
+    PlayersManager --> BasicPlayer_ZAMURAI
+    NetworkActorMovement <..> BasicPlayer_ZAMURAI
+    BasicPlayer_ZAMURAI  --> XXAddonPlayer
     GameManager --> EnemyController
     NetworkActorMovement <..> EnemyController
     EnemyController --> XXAddonEnemy

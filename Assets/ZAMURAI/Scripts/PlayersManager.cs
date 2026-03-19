@@ -259,12 +259,12 @@ public class PlayersManager : NetworkBehaviour
             GetPlayerScript(p).RPC_GameClear();
         }
         await UniTask.Delay(7000);
-        LeaveAndTitle().Forget();
+        RPC_LeaveAndTitle();
     }
 
     // 接続を切ってタイトルシーンへ遷移する
     [Rpc(RpcSources.All, RpcTargets.All)]
-    public async UniTask LeaveAndTitle()
+    public async void RPC_LeaveAndTitle()
     {
         if (Runner != null)
         {

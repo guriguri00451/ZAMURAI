@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "12_issues.md",
+                "file": "techlist.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "12_issues"
+              "title": "techlist"
             }
           }
         ],
@@ -200,13 +200,16 @@
   },
   "active": "095b56028fe8dcd1",
   "lastOpenFiles": [
-    "11_GameRule.md",
-    "10_classes.md",
-    "09_schedule_and_issues_md.md",
-    "06_directory.md",
-    "03_screen-flow_.md",
-    "02_tech-stack.md",
     "01_feature-list_md.md",
-    "12_issues.md"
+    "03_screen-flow_.md",
+    "09_schedule_and_issues_md.md",
+    "10_classes.md",
+    "11_GameRule.md",
+    "14_issues-last.md",
+    "12_issues.md",
+    "13_PosterLayout.md",
+    "techlist.md",
+    "06_directory.md",
+    "02_tech-stack.md"
   ]
 }
