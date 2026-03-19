@@ -82,6 +82,8 @@ public class PlayersManager : NetworkBehaviour
             currentCommand = PointActionType.none;
             reactionTimer = TickTimer.CreateFromSeconds(Runner, 100f); // 最初の人が喋るまでの制限時間
             
+            GetPlayerScript(currentTurnPlayer).RPC_TurnNotify();
+            
             Debug.Log($"ゲームスタート！最初の番は {currentTurnPlayer} です！");
         }
     }

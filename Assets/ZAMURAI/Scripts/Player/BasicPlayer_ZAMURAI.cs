@@ -24,6 +24,7 @@ namespace ZAMURAI.Player
 		[Header("Targeting Settings")]
 		[SerializeField] private float castRadius = 2.0f; // 判定の太さ（大きくするほどガバくなる）
         [SerializeField] private float castRange = 10.0f; // 届く距離
+		[SerializeField] private GameObject notificationObj;
 		private PlayerRef myPlayerRef;
 		private int	_lastInputFrame;
 		private BasicInput_ZAMURAI.AccumulatedData _accumulatedBuffer;
@@ -128,7 +129,6 @@ namespace ZAMURAI.Player
 			proxyAnim.SetFloat("MoveY", frontback);
 			proxyAnim.SetBool("isGrounded", updown != 0);
 
-			proxyAnim.SetBool("pointing", IsPointing);
 		}
 
 		private void InputerAnimUpdate()
@@ -360,6 +360,14 @@ namespace ZAMURAI.Player
 			tempPos.y = -30f;                        // コピーのYを書き換える
 			CameraHandle.position = tempPos;         // 本体のpositionに丸ごと上書きする
         }
+		[Rpc(RpcSources.All, RpcTargets.InputAuthority)]
+		public async void RPC_TurnNotify()
+		{
+			notificationObj.SetActive(true);
+			await UniTask.Delay(3500);
+			notificationObj.SetActive(false);
+
+		}
 
 		[Rpc(RpcSources.All, RpcTargets.InputAuthority)]
         public async void RPC_GameClear()
