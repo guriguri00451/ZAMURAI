@@ -76,6 +76,7 @@ GameObject:
   - component: {fileID: 1211166341388150842}
   - component: {fileID: 2821750270098758253}
   - component: {fileID: 2366453725377721781}
+  - component: {fileID: 3065735408499572657}
   m_Layer: 0
   m_Name: PhotonVoiceChatObject
   m_TagString: Untagged
@@ -255,6 +256,19 @@ MonoBehaviour:
   useOnAudioFilterRead: 0
   useMicrophoneTypeFallback: 1
   recordWhenJoined: 1
+--- !u!114 &3065735408499572657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426531964355501819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47bac108c0e5b431786f642b84845694, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voskDetector: {fileID: 0}
 --- !u!1 &1483526630412513110
 GameObject:
   m_ObjectHideFlags: 0
@@ -947,13 +961,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2706215563038054801}
+  - component: {fileID: 8521128878053846033}
+  - component: {fileID: 2464687207507749300}
   m_Layer: 0
   m_Name: VoskVoiceCommandDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2706215563038054801
 Transform:
   m_ObjectHideFlags: 0
@@ -969,6 +985,40 @@ Transform:
   m_Father: {fileID: 7616533097711895883}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8521128878053846033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313576434376493397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d65e863daa5345c68108b71e4224e82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voiceProcessor: {fileID: 0}
+  ModelPath: vosk-model-small-ja-0.22.zip
+  MaxAlternatives: 3
+  MaxRecordLength: 5
+  AutoStart: 1
+  voiceCommand: {fileID: 0}
+--- !u!114 &2464687207507749300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313576434376493397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf39116cc6db44d47b2eaf534e0f6682, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MicrophoneIndex: 0
+  _minimumSpeakingSampleValue: 0.05
+  _silenceTimer: 1
+  _autoDetect: 0
 --- !u!1 &7513957132252942075
 GameObject:
   m_ObjectHideFlags: 0
